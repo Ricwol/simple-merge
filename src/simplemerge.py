@@ -1,3 +1,4 @@
+from ast import Delete
 from pathlib import Path
 import tkinter as tk
 from tkinter import messagebox
@@ -39,6 +40,41 @@ class SimpleMerge:
         )
         self.merge_button.pack(pady=20)
 
+        button_frame = tk.Frame(root)
+        button_frame.pack(pady=10)
+
+        self.move_up_button = tk.Button(
+            button_frame,
+            text="↑",
+            command=self.move_up,
+            width=10
+        )
+        self.move_up_button.pack(side=tk.RIGHT, padx=5)
+
+        self.move_down_button = tk.Button(
+            button_frame,
+            text="↓",
+            command=self.move_down,
+            width=10
+        )
+        self.move_down_button.pack(side=tk.RIGHT, padx=5)
+
+        self.remove_file_button = tk.Button(
+            button_frame,
+            text="Remove File(s)",
+            command=self.remove_file,
+            width=10
+        )
+        self.remove_file_button.pack(side=tk.RIGHT, padx=5)
+
+        self.clear_list_button = tk.Button(
+            button_frame,
+            text="Clear",
+            command=self.clear_list,
+            width=10
+        )
+        self.clear_list_button.pack(side=tk.RIGHT, padx=5)
+
     def on_drop(self, event: tk.Event) -> None:
         files: list[str] = self.root.tk.splitlist(event.data)
         for file in files:
@@ -71,6 +107,49 @@ class SimpleMerge:
         for index in sorted(selected_indices, reverse=True):
             self.drop_area.delete(index)
             self.pdf_files.pop(index)
+
+    def move_up(self) -> None:
+        selected_indices = self.drop_area.curselection()
+        if not selected_indices or selected_indices[0] == 0:
+            return
+        
+        index = selected_indices[0]
+        self._swap_pdfs(index, index - 1)
+
+    def move_down(self) -> None:
+        selected_indices = self.drop_area.curselection()
+        if not selected_indices or selected_indices[0] == len(self.pdf_files) - 1:
+            return
+        
+        index = selected_indices[0]
+        self._swap_pdfs(index, index + 1)
+
+    def _swap_pdfs(self, index1: int, index2: int) -> None:
+        item1 = self.drop_area.get(index1)
+        item2 = self.drop_area.get(index2)
+
+        self.drop_area.delete(index1)
+        self.drop_area.insert(index1, item2)
+        self.drop_area.delete(index2)
+        self.drop_area.insert(index2, item1)
+
+        self.pdf_files[index1], self.pdf_files[index2] = self.pdf_files[index2], self.pdf_files[index1]
+
+        self.drop_area.select_clear(0, tk.END)
+        self.drop_area.select_set(index2)
+
+    def remove_file(self) -> None:
+        selected_indices = self.drop_area.curselection()
+        if not selected_indices:
+            return
+        
+        for index in sorted(selected_indices, reverse=True):
+            self.drop_area.delete(index)
+            self.pdf_files.pop(index)
+
+    def clear_list(self) -> None:
+        self.drop_area.delete(0, tk.END)
+        self.pdf_files.clear()
 
     def merge_pdfs(self) -> None:
         if not self.pdf_files:
