@@ -1,8 +1,8 @@
-from ast import Delete
 from pathlib import Path
 import tkinter as tk
 from tkinter import messagebox
 from tkinter import filedialog
+from typing import Literal
 
 from pypdf import PdfWriter
 from tkinterdnd2 import TkinterDnD, DND_FILES
@@ -13,75 +13,94 @@ class SimpleMerge:
     def __init__(self, root: TkinterDnD.Tk) -> None:
         self.root = root
         self.root.title("Simple Merge")
+        self.root.geometry("600x400")
+
         self.pdf_files: list[str] = []
         self.drag_index: int = 0
 
+        main_frame = tk.Frame(root)
+        main_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+
+        # Define Drag and Drop Area
         self.drop_area: tk.Listbox = tk.Listbox(
-            root,
+            main_frame,
             selectmode=tk.EXTENDED,
-            height=10,
-            width=50
+            height=15,
+            width=35
         )
-        self.drop_area.pack(pady=20)
+        self.drop_area.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
         self.drop_area.drop_target_register(DND_FILES)
         self.drop_area.dnd_bind("<<Drop>>", self.on_drop)
-
         self.drop_area.bind("<ButtonPress-1>", self.on_press)
         self.drop_area.bind("<B1-Motion>", self.on_drag)
-
         self.drop_area.bind("<Delete>", self.on_delete)
 
-        self.merge_button = tk.Button(
-            root,
-            text="Merge PDFs",
-            command=self.merge_pdfs,
-            height=2,
-            width=20
-        )
-        self.merge_button.pack(pady=20)
+        button_frame = tk.Frame(main_frame)
+        button_frame.pack(side=tk.RIGHT, fill=tk.Y)
 
-        button_frame = tk.Frame(root)
-        button_frame.pack(pady=10)
+        arrow_frame = tk.Frame(button_frame)
+        arrow_frame.pack(side=tk.LEFT, padx=5)
 
         self.move_up_button = tk.Button(
-            button_frame,
+            arrow_frame,
             text="↑",
             command=self.move_up,
-            width=10
+            width=1,
+            height=1
         )
-        self.move_up_button.pack(side=tk.RIGHT, padx=5)
+        self.move_up_button.pack(pady=(40, 5))
 
         self.move_down_button = tk.Button(
-            button_frame,
+            arrow_frame,
             text="↓",
             command=self.move_down,
-            width=10
+            width=1,
+            height=1
         )
-        self.move_down_button.pack(side=tk.RIGHT, padx=5)
+        self.move_down_button.pack(pady=(5, 40))
 
+        # Define Add File(s) button
+        self.add_files_button = tk.Button(
+            button_frame,
+            text="Add File(s)",
+            command=self.add_files,
+            width=12
+        )
+        self.add_files_button.place(relx=0.6, rely=0.4, anchor=tk.CENTER)
+
+        # Define Remove File(s) and Clear buttons
         self.remove_file_button = tk.Button(
             button_frame,
             text="Remove File(s)",
             command=self.remove_file,
-            width=10
+            width=12
         )
-        self.remove_file_button.pack(side=tk.RIGHT, padx=5)
+        self.remove_file_button.place(relx=0.6, rely=0.5, anchor=tk.CENTER)
 
         self.clear_list_button = tk.Button(
             button_frame,
-            text="Clear",
+            text="Clear All",
             command=self.clear_list,
-            width=10
+            width=12
         )
-        self.clear_list_button.pack(side=tk.RIGHT, padx=5)
+        self.clear_list_button.place(relx=0.6, rely=0.6, anchor=tk.CENTER)
+
+        # Define Merge button
+        self.merge_button = tk.Button(
+            button_frame,
+            text="Merge",
+            command=self.merge_pdfs,
+            bg="green",
+            fg="white",
+            font=("Helvetica", 14, "bold"),
+            width=20,
+            height=2
+        )
+        self.merge_button.pack(side=tk.BOTTOM, pady=20)
 
     def on_drop(self, event: tk.Event) -> None:
-        files: list[str] = self.root.tk.splitlist(event.data)
-        for file in files:
-            file_path = Path(file)
-            if file_path.suffix.lower() == ".pdf":
-                self.pdf_files.append(file)
-                self.drop_area.insert(tk.END, file_path.name)
+        files = self.root.tk.splitlist(event.data)
+        self._add_files(files)
 
     def on_press(self, event: tk.Event) -> None:
         self.drag_index = self.drop_area.nearest(event.y)
@@ -137,6 +156,20 @@ class SimpleMerge:
 
         self.drop_area.select_clear(0, tk.END)
         self.drop_area.select_set(index2)
+
+    def add_files(self) -> None:
+        files = filedialog.askopenfilenames(
+            title="Select PDF files",
+            filetypes=[("PDF files", "*.pdf")]
+        )
+        self._add_files(files)
+    
+    def _add_files(self, files: tuple[str, ...] | Literal[""]) -> None:
+        for file in files:
+            file_path = Path(file)
+            if file_path.suffix.lower() == ".pdf":
+                self.pdf_files.append(file)
+                self.drop_area.insert(tk.END, file_path.name)
 
     def remove_file(self) -> None:
         selected_indices = self.drop_area.curselection()
