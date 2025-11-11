@@ -13,6 +13,7 @@ class SimpleMerge:
         self.root = root
         self.root.title("Simple Merge")
         self.pdf_files: list[str] = []
+        self.drag_index: int = 0
 
         self.drop_area: tk.Listbox = tk.Listbox(
             root,
@@ -23,6 +24,10 @@ class SimpleMerge:
         self.drop_area.pack(pady=20)
         self.drop_area.drop_target_register(DND_FILES)
         self.drop_area.dnd_bind("<<Drop>>", self.on_drop)
+
+        self.drop_area.bind("<ButtonPress-1>", self.on_press)
+        self.drop_area.bind("<B1-Motion>", self.on_drag)
+
 
         self.merge_button = tk.Button(
             root,
@@ -40,6 +45,22 @@ class SimpleMerge:
             if file_path.suffix.lower() == ".pdf":
                 self.pdf_files.append(file)
                 self.drop_area.insert(tk.END, file_path.name)
+
+    def on_press(self, event: tk.Event) -> None:
+        self.drag_index = self.drop_area.nearest(event.y)
+
+    def on_drag(self, event: tk.Event) -> None:
+        new_index = self.drop_area.nearest(event.y)
+        if new_index == self.drag_index:
+            return
+        
+        item = self.drop_area.get(self.drag_index)
+        self.drop_area.delete(self.drag_index)
+        self.drop_area.insert(new_index, item)
+
+        self.pdf_files.insert(new_index, self.pdf_files.pop(self.drag_index))
+
+        self.drag_index = new_index
 
     def merge_pdfs(self) -> None:
         if not self.pdf_files:
