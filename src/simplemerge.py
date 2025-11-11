@@ -165,11 +165,24 @@ class SimpleMerge:
         self._add_files(files)
     
     def _add_files(self, files: tuple[str, ...] | Literal[""]) -> None:
+        duplicates: list[str] = []
+
         for file in files:
             file_path = Path(file)
-            if file_path.suffix.lower() == ".pdf":
+            if file in self.pdf_files:
+                duplicates.append(file_path.name)
+            elif file_path.suffix.lower() == ".pdf":
                 self.pdf_files.append(file)
                 self.drop_area.insert(tk.END, file_path.name)
+        
+        if duplicates:
+            messagebox.showinfo(
+                title="Duplicate Files",
+                message=(
+                    "The following files are already in the list and were skipped:\n"
+                    + "\n".join(duplicates)
+                )
+            )
 
     def remove_file(self) -> None:
         selected_indices = self.drop_area.curselection()
