@@ -95,20 +95,22 @@ class SimpleMerge:
 
         self.merge_button.after(
             ms=300 * num_pdfs,
-            func=lambda: (
-                self.merge_button.config(state=tk.NORMAL),
-                messagebox.showinfo(
-                    title="Success",
-                    message=f"PDFs merged to {output_filename}"
-                )
-            )
+            func=lambda: self._finish_merge(output_filename)
         )
 
     def remove_pdf_animated(self, index: int) -> None:
         self.drop_area.after(
             ms=300,
-            func=lambda: (
-                self.drop_area.delete(index),
-                self.pdf_files.pop(index)
-            )
+            func=lambda: self._remove_pdf(index)
+        )
+
+    def _remove_pdf(self, index: int) -> None:
+        self.drop_area.delete(index)
+        self.pdf_files.pop(index)
+
+    def _finish_merge(self, output_filename: str) -> None:
+        self.merge_button.config(state=tk.NORMAL)
+        messagebox.showinfo(
+            title="Success",
+            message=f"PDFs merged to {output_filename}"
         )
