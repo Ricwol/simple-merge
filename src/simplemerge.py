@@ -8,22 +8,36 @@ from pypdf import PdfWriter
 from tkinterdnd2 import TkinterDnD, DND_FILES
 
 
+WINDOW_SIZE = "600x400"
+BUTTON_WIDTH = 12
+ARROW_BUTTON_WITDH = 1
+MERGE_BUTTON_FONT = ("Helvetica", 14, "bold")
+
+
 class SimpleMerge:
+
+    title = "Simple Merge"
 
     def __init__(self, root: TkinterDnD.Tk) -> None:
         self.root = root
-        self.root.title("Simple Merge")
-        self.root.geometry("600x400")
+        self.root.title(self.title)
+        self.root.geometry(WINDOW_SIZE)
 
         self.pdf_files: list[str] = []
         self.drag_index: int = 0
 
-        main_frame = tk.Frame(root)
+        self._setup_ui()
+
+    def _setup_ui(self) -> None:
+        main_frame = tk.Frame(self.root)
         main_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
 
-        # Define Drag and Drop Area
-        self.drop_area: tk.Listbox = tk.Listbox(
-            main_frame,
+        self._setup_drag_and_drop_area(main_frame)
+        self._setup_button_frame(main_frame)
+
+    def _setup_drag_and_drop_area(self, parent: tk.Frame) -> None:
+        self.drop_area = tk.Listbox(
+            parent,
             selectmode=tk.EXTENDED,
             height=15,
             width=35
@@ -35,17 +49,23 @@ class SimpleMerge:
         self.drop_area.bind("<B1-Motion>", self.on_drag)
         self.drop_area.bind("<Delete>", self.on_delete)
 
-        button_frame = tk.Frame(main_frame)
+    def _setup_button_frame(self, parent: tk.Frame) -> None:
+        button_frame = tk.Frame(parent)
         button_frame.pack(side=tk.RIGHT, fill=tk.Y)
 
-        arrow_frame = tk.Frame(button_frame)
+        self._setup_arrow_buttons(button_frame)
+        self._setup_action_buttons(button_frame)
+        self._setup_merge_button(button_frame)
+    
+    def _setup_arrow_buttons(self, parent: tk.Frame) -> None:
+        arrow_frame = tk.Frame(parent)
         arrow_frame.pack(side=tk.LEFT, padx=5)
 
         self.move_up_button = tk.Button(
             arrow_frame,
             text="↑",
             command=self.move_up,
-            width=1,
+            width=ARROW_BUTTON_WITDH,
             height=1
         )
         self.move_up_button.pack(pady=(40, 5))
@@ -54,45 +74,45 @@ class SimpleMerge:
             arrow_frame,
             text="↓",
             command=self.move_down,
-            width=1,
+            width=ARROW_BUTTON_WITDH,
             height=1
         )
         self.move_down_button.pack(pady=(5, 40))
 
-        # Define Add File(s) button
+    def _setup_action_buttons(self, parent: tk.Frame) -> None:
         self.add_files_button = tk.Button(
-            button_frame,
+            parent,
             text="Add File(s)",
             command=self.add_files,
-            width=12
+            width=BUTTON_WIDTH
         )
         self.add_files_button.place(relx=0.6, rely=0.4, anchor=tk.CENTER)
 
         # Define Remove File(s) and Clear buttons
         self.remove_file_button = tk.Button(
-            button_frame,
+            parent,
             text="Remove File(s)",
             command=self.remove_file,
-            width=12
+            width=BUTTON_WIDTH
         )
         self.remove_file_button.place(relx=0.6, rely=0.5, anchor=tk.CENTER)
 
         self.clear_list_button = tk.Button(
-            button_frame,
+            parent,
             text="Clear All",
             command=self.clear_list,
-            width=12
+            width=BUTTON_WIDTH
         )
         self.clear_list_button.place(relx=0.6, rely=0.6, anchor=tk.CENTER)
 
-        # Define Merge button
+    def _setup_merge_button(self, parent: tk.Frame) -> None:        
         self.merge_button = tk.Button(
-            button_frame,
+            parent,
             text="Merge",
             command=self.merge_pdfs,
             bg="green",
             fg="white",
-            font=("Helvetica", 14, "bold"),
+            font=MERGE_BUTTON_FONT,
             width=20,
             height=2
         )
