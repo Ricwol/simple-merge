@@ -43,10 +43,14 @@ class SimpleMerge:
 
     def merge_pdfs(self) -> None:
         if not self.pdf_files:
-            messagebox.showerror("Error", "No PDFs selected!")
+            messagebox.showerror(title="Error", message="No PDFs selected!")
             return
+        
         if len(self.pdf_files) == 1:
-            messagebox.showerror("Error", "Can't merge only one PDF file!")
+            messagebox.showerror(
+                title="Error",
+                message="Can't merge only one PDF file!"
+            )
             return
 
         output_filename = filedialog.asksaveasfilename(
@@ -57,9 +61,33 @@ class SimpleMerge:
         if not output_filename:
             return
         
+        self.merge_button.config(state=tk.DISABLED)
+
         with PdfWriter() as merger:
             for pdf in self.pdf_files:
                 merger.append(pdf)
             merger.write(output_filename)
         
-        messagebox.showinfo("Success", f"PDFs merged to {output_filename}")
+        num_pdfs = len(self.pdf_files)
+        for i in range(num_pdfs - 1, -1, -1):
+            self.remove_pdf_animated(i)
+
+        self.merge_button.after(
+            ms=300 * num_pdfs,
+            func=lambda: (
+                self.merge_button.config(state=tk.NORMAL),
+                messagebox.showinfo(
+                    title="Success",
+                    message=f"PDFs merged to {output_filename}"
+                )
+            )
+        )
+
+    def remove_pdf_animated(self, index: int) -> None:
+        self.drop_area.after(
+            ms=300,
+            func=lambda: (
+                self.drop_area.delete(index),
+                self.pdf_files.pop(index)
+            )
+        )
