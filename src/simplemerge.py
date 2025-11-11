@@ -28,6 +28,7 @@ class SimpleMerge:
         self.drop_area.bind("<ButtonPress-1>", self.on_press)
         self.drop_area.bind("<B1-Motion>", self.on_drag)
 
+        self.drop_area.bind("<Delete>", self.on_delete)
 
         self.merge_button = tk.Button(
             root,
@@ -61,6 +62,15 @@ class SimpleMerge:
         self.pdf_files.insert(new_index, self.pdf_files.pop(self.drag_index))
 
         self.drag_index = new_index
+
+    def on_delete(self, _: tk.Event) -> None:
+        selected_indices = self.drop_area.curselection()
+        if not selected_indices:
+            return
+        
+        for index in sorted(selected_indices, reverse=True):
+            self.drop_area.delete(index)
+            self.pdf_files.pop(index)
 
     def merge_pdfs(self) -> None:
         if not self.pdf_files:
