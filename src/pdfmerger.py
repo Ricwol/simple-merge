@@ -1,4 +1,4 @@
-from collections.abc import Iterable
+from collections.abc import Iterator, Sequence
 from pathlib import Path
 from tkinter import messagebox
 
@@ -18,8 +18,8 @@ class PDFMerger:
     def __len__(self) -> int:
         return len(self._pdf_files)
 
-    def __getitem__(self, item) -> str:
-        return self._pdf_files[item]
+    def __iter__(self) -> Iterator[str]:
+        return iter(self._pdf_files)
 
     @property
     def drag_index(self) -> int | None:
@@ -29,7 +29,7 @@ class PDFMerger:
     def drag_index(self, new_index: int) -> None:
         self._drag_index = new_index
 
-    def add_files(self, files: Iterable[str]) -> None:
+    def add_files(self, files: Sequence[str]) -> None:
         duplicates: list[str] = []
 
         for file in files:
