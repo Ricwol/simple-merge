@@ -4,6 +4,7 @@ from tkinter import filedialog, messagebox
 
 from tkinterdnd2 import DND_FILES
 
+from .config import BINDINGS, BUTTON_LABELS
 from .pdfmerger import PDFMerger
 from .ui import UIManager
 
@@ -17,18 +18,14 @@ class SimpleMerge:
 
         self.ui.add_title(self.title)
 
-        self.ui.drop_area.drop_target_register(DND_FILES)
-        self.ui.drop_area.dnd_bind("<<Drop>>", self.on_drop)
-        self.ui.drop_area.bind("<ButtonPress-1>", self.on_press)
-        self.ui.drop_area.bind("<B1-Motion>", self.on_drag)
-        self.ui.drop_area.bind("<Delete>", self.on_delete)
+        self.ui.drop_target_register(DND_FILES)
+        self.ui.dnd_bind("<<Drop>>", self.on_drop)
 
-        self.ui.move_up_button.config(command=self.move_up)
-        self.ui.move_down_button.config(command=self.move_down)
-        self.ui.add_files_button.config(command=self.add_files)
-        self.ui.remove_files_button.config(command=self.remove_files)
-        self.ui.clear_list_button.config(command=self.clear_list)
-        self.ui.merge_button.config(command=self.merge_pdfs)
+        for func_name, pattern in BINDINGS.items():
+            self.ui.bind(pattern, getattr(self, func_name))
+
+        for label in BUTTON_LABELS:
+            self.ui.add_button_action(label, action=getattr(self, label))
 
     def on_drop(self, event: tk.Event) -> None:
         files = self.ui.root.tk.splitlist(event.data)
@@ -82,7 +79,7 @@ class SimpleMerge:
         self.merger.clear_files()
         self.ui.drop_area.delete(0, tk.END)
 
-    def merge_pdfs(self) -> None:
+    def merge(self) -> None:
         if not self.merger._pdf_files:
             messagebox.showerror(title="Error", message="No PDFs selected!")
             return

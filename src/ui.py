@@ -1,3 +1,4 @@
+from collections.abc import Callable
 import tkinter as tk
 
 from tkinterdnd2 import TkinterDnD
@@ -102,3 +103,16 @@ class UIManager:
 
     def add_title(self, title: str) -> None:
         self.root.title(title)
+
+    def bind(self, pattern: str, func: Callable) -> None:
+        self.drop_area.bind(pattern, func)
+    
+    def dnd_bind(self, pattern: str, func: Callable) -> None:
+        self.drop_area.dnd_bind(pattern, func)
+
+    def drop_target_register(self, drop_target: str) -> None:
+        self.drop_area.drop_target_register(drop_target)
+
+    def add_button_action(self, label: str, action: Callable) -> None:
+        button: tk.Button = getattr(self, f"{label}_button")
+        button.config(command=action)
