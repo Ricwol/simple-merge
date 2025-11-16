@@ -4,7 +4,11 @@ from tkinter import filedialog, messagebox
 
 from tkinterdnd2 import DND_FILES
 
-from config import BINDINGS, BUTTON_LABELS
+from config import (
+    BINDINGS,
+    BUTTON_LABELS,
+    DEFAULT_OUTPUT_FILENAME
+)
 from pdfmerger import PDFMerger
 from ui import UIManager
 
@@ -30,11 +34,7 @@ class App:
     def on_drop(self, event: tk.Event) -> None:
         files = self.ui.root.tk.splitlist(event.data)
         self.merger.add_files(files)
-
-        for file in files:
-            file_path = Path(file)
-            if file in self.merger:
-                self.ui.drop_area.insert(tk.END, file_path.name)
+        self._update_drop_area()
 
     def add_files(self) -> None:
         files = filedialog.askopenfilenames(
@@ -42,10 +42,7 @@ class App:
             filetypes=[("PDF files", "*.pdf")]
         )
         self.merger.add_files(files)
-        for file in files:
-            file_path = Path(file)
-            if file in self.merger:
-                self.ui.drop_area.insert(tk.END, file_path.name)
+        self._update_drop_area()
 
     def move_up(self) -> None:
         selected_indices = self.ui.drop_area.curselection()
@@ -77,7 +74,7 @@ class App:
 
     def clear_list(self) -> None:
         self.merger.clear_files()
-        self.ui.drop_area.delete(0, tk.END)
+        self._update_drop_area()
 
     def merge(self) -> None:
         if not self.merger._pdf_files:
@@ -94,6 +91,7 @@ class App:
         output_filename = filedialog.asksaveasfilename(
             defaultextension=".pdf",
             filetypes=[("PDF files", "*.pdf")],
+            initialfile=DEFAULT_OUTPUT_FILENAME,
             title="Save merged PDF as..."
         )
         if not output_filename:
@@ -105,6 +103,8 @@ class App:
             title="Success",
             message=f"PDFs merged to {output_filename}"
         )
+        self.merger.clear_files()
+        self._update_drop_area()
         self.ui.merge_button.config(state=tk.NORMAL)
 
     def on_press(self, event: tk.Event) -> None:

@@ -43,7 +43,7 @@ class PDFMerger:
             logger.debug(f"Invalid suffix: {file}")
             raise InvalidFileError(f"Not a PDF: {file}")
 
-    def add_files(self, files: Sequence[str]) -> None:
+    def add_files(self, files: Sequence[str]) -> list[str]:
         """Add pdf files, skipping invalid and duplicates."""
         for file in files:
             path = Path(file)
@@ -58,6 +58,7 @@ class PDFMerger:
 
             self._pdf_files.append(file)
             logger.info(f"Added file: {path.name}")
+        return self._pdf_files.copy()
     
     def remove_files(self, indices: Sequence[int]) -> None:
         """Remove files by indices ignoring invalid indices."""
