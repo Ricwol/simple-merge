@@ -1,5 +1,8 @@
 from typing import Final
 
+APP_TITLE: Final[str] = "Simple PDF Merge"
+DEFAULT_OUTPUT_FILENAME: Final[str] = "merged.pdf"
+
 ARROW_BUTTON_SIZE: Final[int] = 1
 BUTTON_WIDTH: Final[int] = 12
 MERGE_BUTTON_FONT: Final[tuple[str, int, str]] = ("Helvetica", 14, "bold")
