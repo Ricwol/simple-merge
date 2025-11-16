@@ -3,7 +3,7 @@ import tkinter as tk
 
 from tkinterdnd2 import TkinterDnD
 
-from . import config
+import config
 
 class UIManager:
 

@@ -4,11 +4,11 @@ from tkinter import filedialog, messagebox
 
 from tkinterdnd2 import DND_FILES
 
-from .config import BINDINGS, BUTTON_LABELS
-from .pdfmerger import PDFMerger
-from .ui import UIManager
+from config import BINDINGS, BUTTON_LABELS
+from pdfmerger import PDFMerger
+from ui import UIManager
 
-class SimpleMerge:
+class App:
 
     title = "Simple Merge"
 
