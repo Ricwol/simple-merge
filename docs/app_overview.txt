@@ -1,0 +1,29 @@
+Application Overview
+This document explains how Simple Merge works internally in simple terms.
+
+Main Components
+UI
+Handles all buttons, the window, and the list where files appear.
+
+App
+Connects the UI with the PDF merger logic. Every button click and event
+flows through the App.
+
+PDFMerger
+Stores the list of PDF files and performs the merge.
+
+User Flow
+1. User adds files through drag-and-drop or the "Add File(s)" button.
+2. App sends the files to PDFMerger.
+3. PDFMerger keeps only valid, non-duplicated PDF files.
+4. UI shows the current list of files.
+5. User arranges or removes files.
+6. When the user presses "Merge", App tells PDFMerger to merge the files.
+7. User chooses where to save the merged file.
+8. List clears and App waits for new files.
+
+File Handling Rules
+• Only .pdf files are accepted
+• Missing or damaged files are skipped
+• Duplicate files do not appear in the list
+• File order is always controlled by the list

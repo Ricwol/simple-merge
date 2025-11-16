@@ -1,0 +1,33 @@
+UI Reference
+This document lists all interactive parts of the user interface.
+
+Main Window
+• Shows the application title
+• Includes the drag-and-drop area
+• Includes all action buttons
+
+Drag-and-Drop Area
+• Accepts PDF files dropped from the file manager
+• Shows all valid files in the order they will be merged
+• Supports selecting single or multiple entries
+• Supports reordering by dragging inside the list
+
+Buttons
+
+Move Up
+Moves the selected file one step higher.
+
+Move Down
+Moves the selected file one step lower.
+
+Add File(s)
+Opens a file selection dialog to add PDF files.
+
+Remove File(s)
+Remove only selected files.
+
+Clear All
+Remove all files from the list.
+
+Merge
+Merges all files in the list and asks where to save the output.

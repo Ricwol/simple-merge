@@ -1,0 +1,14 @@
+PDFMerger Reference
+The PDFMerger component manages the list of files and produces the final PDF.
+
+Responsibilities
+• Validate each file (exists, readable, ends with .pdf)
+• Prevent duplicates
+• Store file paths in merge order
+• Move, swap, remove, and clear entries
+• Combine files into a single PDF
+
+Error Handling
+Invalid files raise InvalidFileError.
+Trying to merge with an empty list raises NoFilesError.
+Index problems raise PDFMergerError.
