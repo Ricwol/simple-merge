@@ -7,13 +7,15 @@ instances, and starts the main event loop.
 
 from tkinterdnd2 import TkinterDnD
 
-from pdfmerger import PDFMerger
 from app import App
+from logger import logger
+from pdfmerger import PDFMerger
 from ui import UI
 
 
 def main() -> None:
     """Start the GUI application."""
+    logger.info("start: application")
     root = TkinterDnD.Tk()
     App(UI(root), PDFMerger())
     root.mainloop()

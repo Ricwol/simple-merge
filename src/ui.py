@@ -13,6 +13,7 @@ import tkinter as tk
 from tkinterdnd2 import TkinterDnD
 
 import config
+from logger import logger
 
 
 class UI:
@@ -22,6 +23,7 @@ class UI:
     """
 
     def __init__(self, root: TkinterDnD.Tk) -> None:
+        logger.info("build: ui start")
         self.root = root
         self.root.geometry(config.WINDOW_SIZE)
 
@@ -35,6 +37,7 @@ class UI:
         self.merge_button: tk.Button
 
         self._setup_ui()
+        logger.info("build: ui done")
 
     def _setup_ui(self) -> None:
         main_frame = tk.Frame(self.root)
@@ -54,6 +57,7 @@ class UI:
             width=35
         )
         self.drop_area.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        logger.info("build: drop area")
 
     def _setup_button_frame(self, parent: tk.Frame) -> None:
         """Build the button frame and initialize action buttons."""
@@ -63,6 +67,7 @@ class UI:
         self._setup_arrow_buttons(button_frame)
         self._setup_action_buttons(button_frame)
         self._setup_merge_button(button_frame)
+        logger.info("build: button window")
     
     def _setup_arrow_buttons(self, parent: tk.Frame) -> None:
         """Create and place arrow action buttons."""
@@ -84,6 +89,7 @@ class UI:
             height=config.ARROW_BUTTON_SIZE
         )
         self.move_down_button.pack(pady=(5, 40))
+        logger.info("build: arrow buttons")
 
     def _setup_action_buttons(self, parent: tk.Frame) -> None:
         """Create and place file handling action buttons."""
@@ -108,6 +114,7 @@ class UI:
             width=config.BUTTON_WIDTH
         )
         self.clear_list_button.place(relx=0.6, rely=0.6, anchor=tk.CENTER)
+        logger.info("build: action buttons")
 
     def _setup_merge_button(self, parent: tk.Frame) -> None:   
         """Create and place the merge action button."""     
@@ -121,6 +128,7 @@ class UI:
             height=2
         )
         self.merge_button.pack(side=tk.BOTTOM, pady=20)
+        logger.info("build: merge button")
 
     def add_title(self, title: str) -> None:
         """Apply a title to the UI's title label."""
