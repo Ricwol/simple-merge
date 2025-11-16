@@ -1,3 +1,8 @@
+"""
+Provide statically defined configuration values
+used across the application.
+"""
+
 from typing import Final
 
 APP_TITLE: Final[str] = "Simple PDF Merge"

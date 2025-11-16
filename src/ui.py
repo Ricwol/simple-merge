@@ -1,3 +1,12 @@
+"""
+Provide the UI layer for the Simple Merge application.
+
+This module builds and organizes all widgets used by the
+application. It exposes a UI class that constructs layout
+and allows the App layer to bind callbacks and interact
+with the visual components.
+"""
+
 from collections.abc import Callable
 import tkinter as tk
 
@@ -5,7 +14,12 @@ from tkinterdnd2 import TkinterDnD
 
 import config
 
-class UIManager:
+
+class UI:
+    """
+    The `UI` builds and organizes visual components
+    and delegates actions to the controlling instance.
+    """
 
     def __init__(self, root: TkinterDnD.Tk) -> None:
         self.root = root
@@ -30,6 +44,9 @@ class UIManager:
         self._setup_button_frame(main_frame)
 
     def _setup_drag_and_drop_area(self, parent: tk.Frame) -> None:
+        """
+        Create and place the listbox used for displaying dropped files.
+        """
         self.drop_area = tk.Listbox(
             parent,
             selectmode=tk.EXTENDED,
@@ -39,6 +56,7 @@ class UIManager:
         self.drop_area.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
 
     def _setup_button_frame(self, parent: tk.Frame) -> None:
+        """Build the button frame and initialize action buttons."""
         button_frame = tk.Frame(parent)
         button_frame.pack(side=tk.RIGHT, fill=tk.Y)
 
@@ -47,6 +65,7 @@ class UIManager:
         self._setup_merge_button(button_frame)
     
     def _setup_arrow_buttons(self, parent: tk.Frame) -> None:
+        """Create and place arrow action buttons."""
         arrow_frame = tk.Frame(parent)
         arrow_frame.pack(side=tk.LEFT, padx=5)
 
@@ -67,6 +86,7 @@ class UIManager:
         self.move_down_button.pack(pady=(5, 40))
 
     def _setup_action_buttons(self, parent: tk.Frame) -> None:
+        """Create and place file handling action buttons."""
         self.add_files_button = tk.Button(
             parent,
             text="Add File(s)",
@@ -89,7 +109,8 @@ class UIManager:
         )
         self.clear_list_button.place(relx=0.6, rely=0.6, anchor=tk.CENTER)
 
-    def _setup_merge_button(self, parent: tk.Frame) -> None:        
+    def _setup_merge_button(self, parent: tk.Frame) -> None:   
+        """Create and place the merge action button."""     
         self.merge_button = tk.Button(
             parent,
             text="Merge",
@@ -102,17 +123,23 @@ class UIManager:
         self.merge_button.pack(side=tk.BOTTOM, pady=20)
 
     def add_title(self, title: str) -> None:
+        """Apply a title to the UI's title label."""
         self.root.title(title)
 
     def bind(self, pattern: str, func: Callable) -> None:
+        """Bind an event pattern to the drop area."""
         self.drop_area.bind(pattern, func)
     
     def dnd_bind(self, pattern: str, func: Callable) -> None:
+        """Bind drag-and-drop event to the drop area."""
         self.drop_area.dnd_bind(pattern, func)
 
     def drop_target_register(self, drop_target: str) -> None:
+        """Register the drop area as an active drag-and-drop target."""
         self.drop_area.drop_target_register(drop_target)
 
-    def add_button_action(self, label: str, action: Callable) -> None:
-        button: tk.Button = getattr(self, f"{label}_button")
-        button.config(command=action)
+    def add_button_action(self, name: str, action: Callable) -> None:
+        """Attach a callback to a button identified by its name."""
+        button: tk.Button = getattr(self, f"{name}_button")
+        if button:
+            button.config(command=action)

@@ -1,3 +1,10 @@
+"""
+This module contains the core logic for managing and merging PDF files.
+
+It validates file inputs, stores paths in order, manipulates
+ordering, and writes the merged output file.
+"""
+
 from collections.abc import Iterator, Sequence
 from pathlib import Path
 
@@ -9,6 +16,7 @@ from errors import (
     PDFMergerError
 )
 from logger import logger
+
 
 class PDFMerger:
     """Manage ordered PDF file paths and write merged output."""
@@ -35,6 +43,11 @@ class PDFMerger:
         self._drag_index = new_index
 
     def _validate_file(self, file: str) -> None:
+        """Verify that a file exists and has a .pdf suffix.
+        
+        Raises:
+            InvalidFileError: If the file does not exist or is not a PDF.
+        """
         path = Path(file)
         if not path.exists():
             logger.debug(f"File missing: {file}")
@@ -43,7 +56,7 @@ class PDFMerger:
             logger.debug(f"Invalid suffix: {file}")
             raise InvalidFileError(f"Not a PDF: {file}")
 
-    def add_files(self, files: Sequence[str]) -> list[str]:
+    def add_files(self, files: Sequence[str]) -> None:
         """Add pdf files, skipping invalid and duplicates."""
         for file in files:
             path = Path(file)
@@ -58,7 +71,6 @@ class PDFMerger:
 
             self._pdf_files.append(file)
             logger.info(f"Added file: {path.name}")
-        return self._pdf_files.copy()
     
     def remove_files(self, indices: Sequence[int]) -> None:
         """Remove files by indices ignoring invalid indices."""

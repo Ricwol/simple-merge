@@ -1,3 +1,10 @@
+"""
+Coordinate interactions between the UI and PDF merger logic.
+
+The `App` class binds events, handles file operations, updates
+the UI state, and controls the merge workflow.
+"""
+
 from pathlib import Path
 import tkinter as tk
 from tkinter import filedialog, messagebox
@@ -10,13 +17,17 @@ from config import (
     DEFAULT_OUTPUT_FILENAME
 )
 from pdfmerger import PDFMerger
-from ui import UIManager
+from ui import UI
+
 
 class App:
-
+    """
+    Control overall application behavior, connect UI callbacks,
+    and synchronize UI state with the PDFMerger model.
+    """
     title = "Simple Merge"
 
-    def __init__(self, ui: UIManager, merger: PDFMerger) -> None:
+    def __init__(self, ui: UI, merger: PDFMerger) -> None:
         self.ui = ui
         self.merger = merger
 
@@ -32,11 +43,13 @@ class App:
             self.ui.add_button_action(label, action=getattr(self, label))
 
     def on_drop(self, event: tk.Event) -> None:
+        """Handle files dropped into the listbox via drag-and-drop."""
         files = self.ui.root.tk.splitlist(event.data)
         self.merger.add_files(files)
         self._update_drop_area()
 
     def add_files(self) -> None:
+        """Open a selection dialog to choose PDF files."""
         files = filedialog.askopenfilenames(
             title="Select PDF files",
             filetypes=[("PDF files", "*.pdf")]
@@ -45,6 +58,7 @@ class App:
         self._update_drop_area()
 
     def move_up(self) -> None:
+        """Move the selected file one position up."""
         selected_indices = self.ui.drop_area.curselection()
         if not selected_indices or selected_indices[0] == 0:
             return
@@ -55,6 +69,7 @@ class App:
         self.ui.drop_area.select_set(index - 1)
 
     def move_down(self) -> None:
+        """Move the selected file one position down."""
         selected_indices = self.ui.drop_area.curselection()
         if not selected_indices or selected_indices[0] == len(self.merger) - 1:
             return
@@ -65,6 +80,7 @@ class App:
         self.ui.drop_area.select_set(index + 1)
 
     def remove_files(self) -> None:
+        """Remove the selected file entries from the list."""
         selected_indices = self.ui.drop_area.curselection()
         if not selected_indices:
             return
@@ -73,10 +89,12 @@ class App:
         self._update_drop_area()
 
     def clear_list(self) -> None:
+        """Clear all files from the list."""
         self.merger.clear_files()
         self._update_drop_area()
 
     def merge(self) -> None:
+        """Perform merge operation and prompt user to save output."""
         if not self.merger._pdf_files:
             messagebox.showerror(title="Error", message="No PDFs selected!")
             return
@@ -108,19 +126,23 @@ class App:
         self.ui.merge_button.config(state=tk.NORMAL)
 
     def on_press(self, event: tk.Event) -> None:
+        """Record the starting index for drag-based reordering."""
         self.merger.drag_index = self.ui.drop_area.nearest(event.y)
 
     def on_drag(self, event: tk.Event) -> None:
+        """Reorder files dynamically based on drag position."""
         new_index = self.ui.drop_area.nearest(event.y)
         self.merger.move_file(new_index)
         self._update_drop_area()
 
     def _update_drop_area(self) -> None:
+        """Refresh the listbox to reflect current merger state."""
         self.ui.drop_area.delete(0, tk.END)
         for file in self.merger:
             self.ui.drop_area.insert(tk.END, Path(file).name)
 
     def on_delete(self, _: tk.Event) -> None:
+        """Remove file entries using the Delete key."""
         selected_indices = self.ui.drop_area.curselection()
         if not selected_indices:
             return
