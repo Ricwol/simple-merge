@@ -36,10 +36,12 @@ class PDFMerger:
 
     @property
     def drag_index(self) -> int | None:
+        """Return the drag index."""
         return self._drag_index
 
     @drag_index.setter
     def drag_index(self, new_index: int) -> None:
+        """Set the drag index."""
         self._drag_index = new_index
 
     def _validate_file(self, file: str) -> None:
@@ -50,10 +52,10 @@ class PDFMerger:
         """
         path = Path(file)
         if not path.exists():
-            logger.debug(f"File missing: {file}")
+            logger.debug("File missing: %s", file)
             raise InvalidFileError(f"File does not exist: {file}")
         if path.suffix.lower() != ".pdf":
-            logger.debug(f"Invalid suffix: {file}")
+            logger.debug("Invalid suffix: %s", file)
             raise InvalidFileError(f"Not a PDF: {file}")
 
     def add_files(self, files: Sequence[str]) -> None:
@@ -63,37 +65,39 @@ class PDFMerger:
             try:
                 self._validate_file(file)
             except InvalidFileError:
-                logger.warning(f"Skipping invalid file: {file}")
+                logger.warning("Skipping invalid file: %s", file)
                 continue
             if file in self._pdf_files:
-                logger.debug(f"Skipping duplicate: {file}")
+                logger.debug("Skipping duplicate: %s", file)
                 continue
 
             self._pdf_files.append(file)
-            logger.info(f"Added file: {path.name}")
-    
+            logger.info("Added file: %s", path.name)
+
     def remove_files(self, indices: Sequence[int]) -> None:
         """Remove files by indices ignoring invalid indices."""
         for index in sorted(indices, reverse=True):
             try:
                 removed = self._pdf_files.pop(index)
-                logger.info(f"Removed file at {index}: {Path(removed).name}")
+                logger.info(
+                    "Removed file at %s: %s", index, Path(removed).name
+                )
             except IndexError:
-                logger.debug(f"Ignore invalid remove index: {index}")
-    
+                logger.debug("Ignore invalid remove index: %d", index)
+
     def clear_files(self) -> None:
         """Clear all files."""
         count = len(self._pdf_files)
         self._pdf_files.clear()
-        logger.info(f"Cleared {count} files")
+        logger.info("Cleared %d files", count)
 
     def swap_files(self, i: int, j: int) -> None:
         """Swap two file positions."""
         try:
             self._pdf_files[i], self._pdf_files[j] = self._pdf_files[j], self._pdf_files[i]
-            logger.debug(f"Swapped indexes {i} and {j}")
+            logger.debug("Swapped indexes %d and %d", i, j)
         except IndexError as exc:
-            logger.error(f"Swap failed indexes {i}, {j}")
+            logger.error("Swap failed indexes %d, %d", i, j)
             raise PDFMergerError("Index out of range for swap") from exc
 
     def move_file(self, new_index: int) -> None:
@@ -108,11 +112,15 @@ class PDFMerger:
         try:
             file = self._pdf_files.pop(self.drag_index)
             self._pdf_files.insert(new_index, file)
-            logger.debug(f"Moved file from {self._drag_index} to {new_index}")
+            logger.debug(
+                "Moved file from %d to %d", self._drag_index, new_index
+            )
             self.drag_index = new_index
         except IndexError as exc:
             self._drag_index = None
-            logger.error(f"Move failed from {self._drag_index} to {new_index}")
+            logger.error(
+                "Move failed from %d to %d", self._drag_index, new_index
+            )
             raise PDFMergerError("Index out of range for move") from exc
 
     def merge_pdfs(self, output_filename: str) -> str:
@@ -126,6 +134,6 @@ class PDFMerger:
                 merger.append(pdf)
             merger.write(output_filename)
             logger.info(
-                f"Merged {len(self._pdf_files)} files to {output_filename}"
+                "Merged %d files to %s", len(self._pdf_files), output_filename
             )
         return output_filename

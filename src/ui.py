@@ -28,13 +28,7 @@ class UI:
         self.root.geometry(config.WINDOW_SIZE)
 
         self.drop_area: tk.Listbox
-
-        self.move_up_button: tk.Button
-        self.move_down_button: tk.Button
-        self.add_files_button: tk.Button
-        self.remove_files_button: tk.Button
-        self.clear_list_button: tk.Button
-        self.merge_button: tk.Button
+        self.buttons: dict[str, tk.Button] = {}
 
         self._setup_ui()
         logger.info("build: ui done")
@@ -68,57 +62,57 @@ class UI:
         self._setup_action_buttons(button_frame)
         self._setup_merge_button(button_frame)
         logger.info("build: button window")
-    
+
     def _setup_arrow_buttons(self, parent: tk.Frame) -> None:
         """Create and place arrow action buttons."""
         arrow_frame = tk.Frame(parent)
         arrow_frame.pack(side=tk.LEFT, padx=5)
 
-        self.move_up_button = tk.Button(
+        self.buttons["move_up"] = tk.Button(
             arrow_frame,
             text="↑",
             width=config.ARROW_BUTTON_SIZE,
             height=config.ARROW_BUTTON_SIZE
         )
-        self.move_up_button.pack(pady=(40, 5))
+        self.buttons["move_up"].pack(pady=(40, 5))
 
-        self.move_down_button = tk.Button(
+        self.buttons["move_down"] = tk.Button(
             arrow_frame,
             text="↓",
             width=config.ARROW_BUTTON_SIZE,
             height=config.ARROW_BUTTON_SIZE
         )
-        self.move_down_button.pack(pady=(5, 40))
+        self.buttons["move_down"].pack(pady=(5, 40))
         logger.info("build: arrow buttons")
 
     def _setup_action_buttons(self, parent: tk.Frame) -> None:
         """Create and place file handling action buttons."""
-        self.add_files_button = tk.Button(
+        self.buttons["add_files"] = tk.Button(
             parent,
             text="Add File(s)",
             width=config.BUTTON_WIDTH
         )
-        self.add_files_button.place(relx=0.6, rely=0.4, anchor=tk.CENTER)
+        self.buttons["add_files"].place(relx=0.6, rely=0.4, anchor=tk.CENTER)
 
         # Define Remove File(s) and Clear buttons
-        self.remove_files_button = tk.Button(
+        self.buttons["remove_files"] = tk.Button(
             parent,
             text="Remove File(s)",
             width=config.BUTTON_WIDTH
         )
-        self.remove_files_button.place(relx=0.6, rely=0.5, anchor=tk.CENTER)
+        self.buttons["remove_files"].place(relx=0.6, rely=0.5, anchor=tk.CENTER)
 
-        self.clear_list_button = tk.Button(
+        self.buttons["clear_list"] = tk.Button(
             parent,
             text="Clear All",
             width=config.BUTTON_WIDTH
         )
-        self.clear_list_button.place(relx=0.6, rely=0.6, anchor=tk.CENTER)
+        self.buttons["clear_list"].place(relx=0.6, rely=0.6, anchor=tk.CENTER)
         logger.info("build: action buttons")
 
-    def _setup_merge_button(self, parent: tk.Frame) -> None:   
+    def _setup_merge_button(self, parent: tk.Frame) -> None:
         """Create and place the merge action button."""     
-        self.merge_button = tk.Button(
+        self.buttons["merge"] = tk.Button(
             parent,
             text="Merge",
             bg="green",
@@ -127,7 +121,7 @@ class UI:
             width=20,
             height=2
         )
-        self.merge_button.pack(side=tk.BOTTOM, pady=20)
+        self.buttons["merge"].pack(side=tk.BOTTOM, pady=20)
         logger.info("build: merge button")
 
     def add_title(self, title: str) -> None:
@@ -137,7 +131,7 @@ class UI:
     def bind(self, pattern: str, func: Callable) -> None:
         """Bind an event pattern to the drop area."""
         self.drop_area.bind(pattern, func)
-    
+
     def dnd_bind(self, pattern: str, func: Callable) -> None:
         """Bind drag-and-drop event to the drop area."""
         self.drop_area.dnd_bind(pattern, func)
@@ -148,6 +142,6 @@ class UI:
 
     def add_button_action(self, name: str, action: Callable) -> None:
         """Attach a callback to a button identified by its name."""
-        button: tk.Button = getattr(self, f"{name}_button")
+        button: tk.Button | None = self.buttons.get(name)
         if button:
             button.config(command=action)

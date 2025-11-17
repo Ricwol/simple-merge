@@ -48,9 +48,9 @@ class App:
     def on_drop(self, event: tk.Event) -> None:
         """Handle files dropped into the listbox via drag-and-drop."""
         files = self.ui.root.tk.splitlist(event.data)
-        logger.info(f"drop: received {len(files)} file(s)")
+        logger.info("drop: received %d file(s)", len(files))
         self.merger.add_files(files)
-        logger.info(f"add: accepted {len(self.merger)} file(s)")
+        logger.info("add: accepted %d file(s)", len(self.merger))
         self._update_drop_area()
 
     def add_files(self) -> None:
@@ -63,9 +63,9 @@ class App:
         if not files:
             logger.info("open: file dialog cancelled")
             return
-        
+
         self.merger.add_files(files)
-        logger.info(f"add: accepted {len(self.merger)} file(s) from dialog")
+        logger.info("add: accepted %d file(s) from dialog", len(self.merger))
         self._update_drop_area()
 
     def move_up(self) -> None:
@@ -73,10 +73,10 @@ class App:
         selected_indices = self.ui.drop_area.curselection()
         if not selected_indices or selected_indices[0] == 0:
             return
-        
+
         index = selected_indices[0]
         self.merger.swap_files(index, index - 1)
-        logger.info(f"move: up index {index}")
+        logger.info("move: up index %d", index)
         self._update_drop_area()
         self.ui.drop_area.select_set(index - 1)
 
@@ -85,10 +85,10 @@ class App:
         selected_indices = self.ui.drop_area.curselection()
         if not selected_indices or selected_indices[0] == len(self.merger) - 1:
             return
-        
+
         index = selected_indices[0]
         self.merger.swap_files(index, index + 1)
-        logger.info(f"move: down index {index}")
+        logger.info("move: down index %d", index)
         self._update_drop_area()
         self.ui.drop_area.select_set(index + 1)
 
@@ -97,23 +97,23 @@ class App:
         selected_indices = self.ui.drop_area.curselection()
         if not selected_indices:
             return
-        
+
         self.merger.remove_files(selected_indices)
-        logger.info(f"remove: indices {selected_indices}")
+        logger.info("remove: indices %s", selected_indices)
         self._update_drop_area()
 
     def clear_list(self) -> None:
         """Clear all files from the list."""
-        logger.info(f"clear: files")
+        logger.info("clear: files")
         self.merger.clear_files()
         self._update_drop_area()
 
     def merge(self) -> None:
         """Perform merge operation and prompt user to save output."""
-        if not self.merger._pdf_files:
+        if len(self.merger) == 0:
             messagebox.showerror(title="Error", message="No PDFs selected!")
             return
-        
+
         if len(self.merger) == 1:
             messagebox.showerror(
                 title="Error",
@@ -129,11 +129,11 @@ class App:
         )
         if not output_filename:
             return
-        
+
         self.ui.merge_button.config(state=tk.DISABLED)
-        logger.info(f"merge: start {len(self.merger)} file(s)")
+        logger.info("merge: start %d file(s)", len(self.merger))
         self.merger.merge_pdfs(output_filename)
-        logger.info(f"merge: success {output_filename}")
+        logger.info("merge: success %s", output_filename)
 
         messagebox.showinfo(
             title="Success",
@@ -151,7 +151,7 @@ class App:
     def on_drag(self, event: tk.Event) -> None:
         """Reorder files dynamically based on drag position."""
         new_index = self.ui.drop_area.nearest(event.y)
-        logger.info(f"drag: move to {new_index}")
+        logger.info("drag: move to %d", new_index)
         self.merger.move_file(new_index)
         self._update_drop_area()
 
@@ -168,5 +168,5 @@ class App:
             return
 
         self.merger.remove_files(selected_indices)
-        logger.info(f"delete: indices {selected_indices}")
+        logger.info("delete: indices %s", selected_indices)
         self._update_drop_area()
