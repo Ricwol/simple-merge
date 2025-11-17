@@ -19,6 +19,7 @@ def main() -> None:
     root = TkinterDnD.Tk()
     App(UI(root), PDFMerger())
     root.mainloop()
+    logger.info("stop: application")
 
 
 if __name__ == "__main__":

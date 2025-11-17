@@ -26,3 +26,17 @@ BUTTON_LABELS: Final[list[str]] = [
     "clear_list",
     "merge",
 ]
+
+# Logging configuration
+LOG_FORMAT: Final[str] = "%(asctime)s %(levelname)s %(name)s: %(message)s"
+LOG_DATEFMT: Final[str] = "%Y-%m-%d %H:%M:%S"
+
+# Log file and rotation: rotate after 1MB and keep 3 backups
+LOG_FILE: Final[str] = "simple_merge.log"
+LOG_ROTATE_WHEN: Final[str] = "midnight"
+LOG_ROTATE_INTERVAL: Final[int] = 1
+LOG_BACKUP_COUNT: Final[int] = 3
+
+# Optional: size based rotation fallback
+LOG_MAX_BYTES: Final[int] = 1_000_000
+LOG_BACKUP_COUNT_BYTES: Final[int] = 3
