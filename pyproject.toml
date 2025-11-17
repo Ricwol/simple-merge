@@ -9,8 +9,15 @@ dependencies = [
     "tkinterdnd2>=0.4.3",
 ]
 
+[project.scripts]
+simple-merge = "main:main"
+
 [dependency-groups]
 dev = [
     "coverage>=7.11.3",
+    "pylint>=4.0.3",
     "pytest>=9.0.0",
 ]
+
+[tool.uv]
+managed = true
